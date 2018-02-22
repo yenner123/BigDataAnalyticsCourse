@@ -12,15 +12,16 @@ def find(doc, find_term):
     return coincidences
 
 
-def cosine_similarity(v1, v2):
-    sumxx, sumxy, sumyy = 0, 0, 0
-    for i in range(len(v1)):
-        x = v1[i]
-        y = v2[i]
+def cosine_similarity(vectorSpace1, vectorSpace2):
+    numerator = 0 
+    sumxx, sumyy = 0, 0
+    for i in range(len(vectorSpace1)):
+        x = vectorSpace1[i]
+        y = vectorSpace2[i]
         sumxx += x*x
         sumyy += y*y
-        sumxy += x*y
-    return sumxy/math.sqrt(sumxx*sumyy)
+        numerator += x*y
+    return numerator/math.sqrt(sumxx*sumyy)
 
 
 inverdIndex = {}
@@ -38,10 +39,12 @@ file_words = open("words.txt", "r")
 words = json.JSONDecoder().decode(file_words.read())
 file_words.close()
 
+allTfidf = {}
 file_words = open("tfidf.txt", "r")
 allTfidf = json.JSONDecoder().decode(file_words.read())
 file_words.close()
 
+documents = {}
 file_documents = open("documents.txt", "r")
 documents = json.JSONDecoder().decode(file_documents.read())
 file_documents.close()
@@ -54,11 +57,11 @@ for word in word_tokenize(query.lower()):  # split
     if word not in stopwords:
         listQuery.append(word)
 
-counter1 = Counter(listQuery)
+histQuery = Counter(listQuery)
 
 vectorSpace = []
 for word in words:
-    vectorSpace.append(find(counter1, word))
+    vectorSpace.append(find(histQuery, word))
 
 tfidf = []
 doc_lenght = len(vectorSpace)
@@ -69,24 +72,24 @@ for ter in vectorSpace:
     tfidf.append(eq)
 
 # Aca con el index invertido
-CosSim = {}
-for palabra in counter1:
+cosSim = {}
+for palabra in histQuery:
     if palabra in inverdIndex:  # si la palabra esta en el index invertido
         for key in inverdIndex.get(palabra):
-            if key not in CosSim:
+            if key not in cosSim:
                 calc = cosine_similarity(tfidf, allTfidf[key])
-                CosSim[key] = calc
+                cosSim[key] = calc
 
 
 print("done in %0.3fs." % (time() - t0))
 
-# print(CosSim)
+# print(cosSim)
 
 print("Query is: " + query)
 print()
 
 i = 0
-for key in sorted(CosSim, key=CosSim.get):
+for key in sorted(cosSim, key=cosSim.get):
     print("Topic #%s:" % i)
     print('%.300s' % documents[key] + "...")
     print()
