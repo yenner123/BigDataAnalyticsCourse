@@ -49,14 +49,18 @@ file_documents = open("documents.txt", "r")
 documents = json.JSONDecoder().decode(file_documents.read())
 file_documents.close()
 
-query = "USA"
+inv_frec_vector = []
+file_inv_frec_vector = open("inv_frec_vector.txt", "r")
+inv_frec_vector = json.JSONDecoder().decode(file_inv_frec_vector.read())
+file_inv_frec_vector.close()
+
+query = "company bahia cocoa usa a e i"
 t0 = time()
 
 listQuery = []
 for word in word_tokenize(query.lower()):  # split
     if word not in stopwords:
         listQuery.append(word)
-
 histQuery = Counter(listQuery)
 
 vectorSpace = []
@@ -64,11 +68,10 @@ for word in words:
     vectorSpace.append(find(histQuery, word))
 
 tfidf = []
-doc_lenght = len(vectorSpace)
-for ter in vectorSpace:
+for id, ter_frec in enumerate(vectorSpace):
     eq = 0
-    if ter > 0:
-        eq = ter*math.log(doc_lenght)
+    if ter_frec > 0:
+        eq = ter_frec*inv_frec_vector[id]
     tfidf.append(eq)
 
 # Aca con el index invertido
@@ -80,17 +83,19 @@ for palabra in histQuery:
                 calc = cosine_similarity(tfidf, allTfidf[key])
                 cosSim[key] = calc
 
-
-print("done in %0.3fs." % (time() - t0))
-
-# print(cosSim)
-
-print("Query is: " + query)
+print()
+print("Tiempo total de la busqueda %0.3fs." % totalTime)
+print("Total de documentos encontrados: " + len(docs))
+print("La consulta es: " + query)
 print()
 
 i = 0
-for key in sorted(cosSim, key=cosSim.get):
-    print("Topic #%s:" % i)
-    print('%.300s' % documents[key] + "...")
+for key in sorted(cosSim, key=cosSim.get, reverse=True):
+    print("Documento encontrado: #%s, SimCos: %f" % (i,cosSim[key]))
+    print('Doc %s: %s' % (key, documents[key]) + "...")
     print()
     i += 1
+
+    if i>10:
+        break
+        

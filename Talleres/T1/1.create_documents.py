@@ -4,7 +4,7 @@ import os
 import sys
 import json
  
-def replace(string):    
+def replace(string):
     string = string.replace("\n", " ")
     string = string.replace("\r", " ")
     string = string.replace("\t", " ")
@@ -15,36 +15,29 @@ def replace(string):
     string = string.replace("  ", " ")    
     return  string
         
-
-def main(args):
-    
+def main(args):    
     path_documents = 'documents/'
     documents = []
     for filename in glob.glob(os.path.join(path_documents, '*.sgm')):
         file = open(filename, "r")        
-        documents.append(BeautifulSoup(file.read(), "html.parser"))             
-
-    file = open("documents.txt","w", encoding="utf8")     
-    dic = {}    
-    count = 0
-    for doc in documents:     
+        documents.append(BeautifulSoup(file.read(), "html.parser"))  
+        file.close()           
+  
+    dic = {}        
+    for id_doc, doc in enumerate(documents):     
         for reuters in doc.find_all('reuters'):       
-            title = ""
-            body = ""
+            title, body = "",""
 
             if reuters.title:                        
                 title = reuters.title.get_text()
             if reuters.body:
                 body = reuters.body.get_text()
 
-            content = title + " " + body
-            
-            dic[count] = replace(content).lower()
-            count = count + 1       
-                
+            dic[id_doc] = replace(title + " " + body).lower()                  
+
+    file = open("documents.txt","w")   
     file.write(json.JSONEncoder().encode(dic))
-    file.close()
-    print(count)
+    file.close()    
 
 # metodo main
 if __name__ == '__main__':
