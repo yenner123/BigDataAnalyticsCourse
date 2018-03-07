@@ -5,38 +5,26 @@ from time import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
 from sklearn.datasets import fetch_20newsgroups
-from docx import Document
-from docx.text.paragraph import Paragraph
 
-n_samples = 100
-n_features = 100
+n_samples = 500
+n_features = 500
 n_topics = 10
-n_top_words = 3
+n_top_words = 30
 
 t0 = time()
 print("Loading dataset and extracting TF-IDF features...")
 
-file_stopwords = open("stopwords.txt", "r", errors="replace")
+file_stopwords = open("spanish.txt", "r", encoding='utf-8')
 stopwords = file_stopwords.read().split()
 file_stopwords.close()
 
-f = open('test.docx', 'rb')
-document = Document(f)
+f = open('corpus.txt', 'r')
+corpus = JSONDecoder().decode(f.read())
 f.close()
 
-paragraphs = []
-for paragraph in  document.paragraphs:    
-    texts = paragraph.text
-    if texts:
-        texts = texts.lower()
-        texts = texts.replace('á', 'a')
-        texts = texts.replace('é', 'e')
-        texts = texts.replace('í', 'i')
-        texts = texts.replace('ó', 'o')
-        texts = texts.replace('ú', 'u')
-        paragraphs.append(''.join(texts))        
-
-dataset = paragraphs
+dataset = []
+for documents in corpus.values():        
+    dataset.append(documents.lower())        
 
 vectorizer = TfidfVectorizer(
     max_df=0.95, min_df=2, max_features=n_features, stop_words=stopwords)
@@ -59,6 +47,5 @@ print()
 
 for topic_idx, topic in enumerate(nmf.components_):
     print("Topic #%d:" % topic_idx)
-    print(" ".join([feature_names[i]
-                    for i in topic.argsort()[:-n_top_words - 1:-1]]))
+    print(" ".join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]))
     print()
