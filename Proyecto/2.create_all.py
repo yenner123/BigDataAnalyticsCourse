@@ -1,45 +1,9 @@
 import sys
 import json
+import utils
 from time import time
 from math import log
 from collections import Counter
-
-def RemoveSymbols(word):    
-    word = word.replace("==", " ")
-    word = word.replace("(", " ")
-    word = word.replace(")", " ")
-    word = word.replace(".", " ")
-    word = word.replace(",", " ")
-    word = word.replace(" =", " ")
-    word = word.replace("\n", " ")
-    word = word.replace("\r", " ")
-    word = word.replace("\t", " ")
-    word = word.replace(":", " ")
-    word = word.replace("*", " ")
-    word = word.replace("[", " ")
-    word = word.replace("]", " ")
-    word = word.replace(">", " ")
-    word = word.replace("<", " ")
-    word = word.replace('"\"', ' ')
-    word = word.replace("/", " ")
-    word = word.replace("«", " ")
-    word = word.replace("»", " ")
-    word = word.replace("—", " ")
-    word = word.replace("     ", " ")
-    word = word.replace("    ", " ")
-    word = word.replace("   ", " ")
-    word = word.replace("  ", " ") 
-    word = word.replace(' "', " ") 
-    word = word.replace('" ', " ") 
-    word = word.replace(' " ', " ") 
-    word = word.replace('""', " ") 
-    word = word.replace('" "', " ") 
-    word = word.replace(' "" ', " ") 
-    word = word.replace('\u200b', " ") 
-    return word
-
-def isNotEmpty(s):
-    return bool(s and s.strip())
 
 def main(args):
     stopwords = []
@@ -50,18 +14,17 @@ def main(args):
     file_documents = open("corpus.txt", "r", encoding='utf-8')
     corpus = json.JSONDecoder().decode(file_documents.read())
 
-    t0 = time()
-
     dataset = {}
     dictionary = []
     inverterIndex = {}
     tfidf = {}    
     inv_frec_vector = []
 
+    t0 = time()
     for key, doc in corpus.items():
         doc_listwords = []
-        for word in RemoveSymbols(doc.lower()).split():                                     
-            if word not in stopwords and isNotEmpty(word):                
+        for word in utils.removeSymbols(doc.lower()).split():                                     
+            if word not in stopwords and utils.isNotEmpty(word):                
                 doc_listwords.append(word)                 
                 if word in inverterIndex:                
                     if key not in inverterIndex[word]:
