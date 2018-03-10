@@ -4,10 +4,12 @@ from time import sleep
 
 
 corpus = {}
-n_len = 5
+n_len = 500
 
+wikipedia.set_rate_limiting(False)
 wikipedia.set_lang("es")
-pagesList = wikipedia.random(n_len)
+pagesList = wikipedia.random(n_len) + wikipedia.random(n_len)
+print(len(pagesList))
 
 for i, page in enumerate(pagesList):
     print("Processing page...", end=' ')
@@ -20,7 +22,7 @@ for i, page in enumerate(pagesList):
 
     corpus[i] = foundPage.title + " " + foundPage.content
     print("page %i added" % i)
-    sleep(0.1)  # evita ser bloquedo por multiples peticiones
+    # sleep(0.1)  # evita ser bloquedo por multiples peticiones
 
 print("Finish")
 

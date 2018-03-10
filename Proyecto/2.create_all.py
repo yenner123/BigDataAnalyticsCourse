@@ -20,6 +20,7 @@ def main(args):
     tfidf = {}    
     inv_frec_vector = []
 
+    print("start algorithm")
     t0 = time()
     for id_doc, document in corpus.items():
         doc_listwords = []
