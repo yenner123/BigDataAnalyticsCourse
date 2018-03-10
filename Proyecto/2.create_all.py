@@ -21,17 +21,17 @@ def main(args):
     inv_frec_vector = []
 
     t0 = time()
-    for key, doc in corpus.items():
+    for id_doc, document in corpus.items():
         doc_listwords = []
-        for word in utils.removeSymbols(doc.lower()).split():                                     
+        for word in utils.removeSymbols(document.lower()).split():                                     
             if word not in stopwords and utils.isNotEmpty(word):                
                 doc_listwords.append(word)                 
                 if word in inverterIndex:                
-                    if key not in inverterIndex[word]:
-                        inverterIndex[word].append(key)
+                    if id_doc not in inverterIndex[word]:
+                        inverterIndex[word].append(id_doc)
                 else:
-                    inverterIndex[word] = [key]              
-        dataset[key] = Counter(doc_listwords)
+                    inverterIndex[word] = [id_doc]              
+        dataset[id_doc] = Counter(doc_listwords)
     
     doc_lenght = len(dataset)
     

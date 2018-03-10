@@ -5,6 +5,7 @@ import utils
 from time import time
 from collections import Counter
 
+
 def opendDocuments():
     file_inverdIndex = open("inverterIndex.txt", "r", encoding='utf-8')
     inverdIndex = json.JSONDecoder().decode(file_inverdIndex.read())
@@ -29,29 +30,27 @@ def opendDocuments():
     return inverdIndex, stopwords, allTfidf, corpus, inv_frec_vector
 
 def search(query):
-    dataset = {}        
-    tfidf = []       
+    dataset = {}
+    tfidf = [0] * len(inverdIndex)
     cos_sim = {}
 
     doc_listwords = []
-    for word in utils.removeSymbols(query.lower()).split():                                     
-        if word not in stopwords and utils.isNotEmpty(word):                
-            doc_listwords.append(word)                                        
+    for word in utils.removeSymbols(query.lower()).split():
+        if word not in stopwords and utils.isNotEmpty(word):
+            doc_listwords.append(word)
     dataset = Counter(doc_listwords)
     
-    for id, word in enumerate(inverdIndex.keys()):                                                                        
-        eq = 0
+    for id, word in enumerate(inverdIndex.keys()):
         if word in dataset:
-            eq = dataset.get(word, 0)*inv_frec_vector[id]
-        tfidf.append(eq)       
-    
+            tfidf[id] = dataset.get(word, 0)*inv_frec_vector[id]             
+
     for word in dataset.keys():
         if word in inverdIndex:  # si la palabra esta en el index invertido
             for key in inverdIndex.get(word):
-                if key not in cos_sim:
-                    calc = utils.cosineSimilarity(tfidf, allTfidf[key])
-                    cos_sim[key] = calc
-    return cos_sim    
+                if key not in cos_sim:                    
+                    cos_sim[key] = utils.cosineSimilarity(tfidf, allTfidf[key])
+    return cos_sim
+
 
 """ main """
 # abrir documentos con los documentos procesados
@@ -78,7 +77,7 @@ print()
 i = 0
 for key in sorted(docs, key=docs.get, reverse=True):
     print("Documento encontrado: #%s, cs: %f" % (i, docs[key]))
-    print('Documento #%s: %s' % (key, corpus[key]))
+    print('Documento #%s: %.500s' % (key, corpus[key]))
     print()
     i += 1
 
